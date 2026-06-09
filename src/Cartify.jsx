@@ -341,8 +341,8 @@ function AuthPage({ mode }) {
   const toast = useToast();
   const api = useApi();
 
-  const [form, setForm] = useState({ name: "", username: "", password: "" });
-  const [loading, setLoading] = useState(false);
+const [form, setForm] = useState({ username: "", email: "", password: "" });
+const [loading, setLoading] = useState(false);
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
@@ -350,14 +350,14 @@ function AuthPage({ mode }) {
     setLoading(true);
     try {
       if (mode === "register") {
-        await api.post("/api/auth/register", { username: form.username, password: form.password });
+        await api.post("/api/auth/register", { username: form.username, email: form.email, password: form.password });
         toast("Registered successfully! Please login.", "success");
         navigate("login");
       } else {
         const data = await api.post("/api/auth/login", { username: form.username, password: form.password });
         // data may be { token, role, email } or { jwt, ... } – adapt as needed
         const tok = data.token || data.jwt || data.accessToken || data;
-        login(tok, { username: form.username, role: data.role, name: form.username });
+        login(tok, { username: form.username, email: form.email, role: data.role, name: form.username });
         toast("Welcome back!", "success");
         navigate("home");
       }
@@ -383,9 +383,9 @@ function AuthPage({ mode }) {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {mode === "register" && (
-            <div><label>Full Name</label><input placeholder="John Doe" value={form.name} onChange={set("name")} /></div>
+            <div><label>Username</label><input placeholder="johndoe" value={form.username} onChange={set("username")} /></div>
           )}
-          <div><label>Username</label><input placeholder="johndoe" value={form.username} onChange={set("username")} /></div>
+          <div><label>Email</label><input type="email" placeholder="you@example.com" value={form.email} onChange={set("email")} /></div>
           <div><label>Password</label><input type="password" placeholder="••••••••" value={form.password} onChange={set("password")} /></div>
 
           <Btn style={{ width: "100%", justifyContent: "center", marginTop: 6 }} disabled={loading} onClick={submit}>
@@ -461,10 +461,11 @@ function ProductsPage() {
           {filtered.map((p, i) => (
             <Card key={p.id || i} style={{ animation: `slideUp ${0.1 + i * 0.05}s ease both` }}>
               <div style={{
-                height: 160, background: G.surfaceAlt, borderRadius: G.radiusSm,
-                display: "grid", placeItems: "center", fontSize: 52, marginBottom: 16,
+                height: "auto", minHeight: 200, maxHeight: 240, background: G.surfaceAlt, 
+                borderRadius: G.radiusSm, display: "grid", placeItems: "center", 
+                fontSize: 52, marginBottom: 16, overflow: "visible",
               }}>
-                {p.imageUrl ? <img src={p.imageUrl} style={{ height: "100%", width: "100%", objectFit: "cover", borderRadius: G.radiusSm }} alt="" /> : "📦"}
+                {p.imageUrl ? <img src={p.imageUrl} style={{ width: "100%", height: "auto", maxHeight: 240, objectFit: "contain", borderRadius: G.radiusSm, display: "block", padding: "8px"}} alt="" /> : "📦"}              
               </div>
               <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17, marginBottom: 6 }}>
                 {p.name || p.productName || "Unnamed Product"}
@@ -512,9 +513,21 @@ function CartPage({ onCartChange }) {
 
   const remove = async (id) => {
     try {
-      await api.del(`/api/cart/remove/${id}`);
+      await api.del(`/api/cart/${id}`);
       toast("Removed from cart", "success");
       load();
+    } catch (err) { toast(err.message, "error"); }
+  };
+
+  const updateQty = async (id, newQty) => {
+    if (newQty < 1) {
+      // If quantity goes to 0, remove the item
+      await remove(id);
+      return;
+    }
+    try {
+      await api.put(`/api/cart/update?itemId=${id}&quantity=${newQty}`);
+      load(); // reload cart
     } catch (err) { toast(err.message, "error"); }
   };
 
@@ -562,12 +575,27 @@ function CartPage({ onCartChange }) {
               return (
                 <Card key={id || i} style={{ display: "flex", gap: 16, alignItems: "center" }}>
                   <div style={{
-                    width: 60, height: 60, background: G.surfaceAlt, borderRadius: G.radiusSm,
+                    width: 70, height: 70, background: G.surfaceAlt, borderRadius: G.radiusSm,
                     display: "grid", placeItems: "center", fontSize: 28, flexShrink: 0,
-                  }}>📦</div>
+                    overflow: "hidden",
+                    }}>
+                    {item.product?.imageUrl || item.imageUrl ? <img src={item.product?.imageUrl || item.imageUrl} style={{ width: "100%", height: "100%", objectFit: "contain", padding: "4px" }} alt="" /> : "📦" }
+                  </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: 16 }}>{name}</div>
-                    <div style={{ color: G.muted, fontSize: 13 }}>Qty: {qty}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+                      <button onClick={() => updateQty(id, qty - 1)} style={{ 
+                        width: 26, height: 26, borderRadius: "50%", border: `1px solid ${G.border}`,
+                        background: G.surfaceAlt, color: G.text, cursor: "pointer", fontSize: 16,
+                        display: "grid", placeItems: "center"
+                      }}>−</button>
+                      <span style={{ color: G.text, fontWeight: 700, minWidth: 20, textAlign: "center" }}>{qty}</span>
+                      <button onClick={() => updateQty(id, qty + 1)} style={{
+                      width: 26, height: 26, borderRadius: "50%", border: `1px solid ${G.border}`,
+                      background: G.surfaceAlt, color: G.text, cursor: "pointer", fontSize: 16,
+                      display: "grid", placeItems: "center"
+                      }}>+</button>
+                  </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 18, color: G.accent }}>
