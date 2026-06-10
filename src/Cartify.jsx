@@ -144,7 +144,19 @@ const css = `
   input:focus, textarea:focus { border-color: ${G.accent}; }
   label { display: block; font-size: 13px; color: ${G.muted}; margin-bottom: 5px; font-weight: 600; letter-spacing:.5px; }
   ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: ${G.surface}; }
-  ::-webkit-scrollbar-thumb { background: ${G.border}; border-radius: 6px; }
+  ::-webkit-scrollbar-thumb { background: ${G.border}; border-radius: 6px; 
+  }
+  .product-card {
+    transition: transform 0.15s ease, box-shadow 0.2s ease !important;
+  }
+  .product-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 0 20px ${G.accentGlow} !important;
+  }
+  // .product-card:active {
+  //   transform: scale(1.03) !important;
+  //   box-shadow: 0 0 28px ${G.accentGlow} !important;
+  // }
 `;
 
 // ─── COMPONENTS ────────────────────────────────────────────────────────────
@@ -165,8 +177,18 @@ function Btn({ children, onClick, variant = "primary", size = "md", style: s = {
   return (
     <button type={type} onClick={onClick} disabled={disabled}
       style={{ ...base, ...sizes[size], ...variants[variant], ...s }}
-      onMouseEnter={e => { if (!disabled) e.currentTarget.style.filter = "brightness(1.15)"; }}
-      onMouseLeave={e => { e.currentTarget.style.filter = ""; }}>
+      onMouseEnter={e => { 
+        if (!disabled) { 
+          e.currentTarget.style.filter = "brightness(1.15)"; 
+          e.currentTarget.style.boxShadow = `0 0 14px ${G.accentGlow}`;
+          e.currentTarget.style.transform = "translateY(-2px)";
+        }
+      }}
+      onMouseLeave={e => { 
+        e.currentTarget.style.filter = ""; 
+        e.currentTarget.style.boxShadow = "";
+        e.currentTarget.style.transform = "";
+      }}>
       {children}
     </button>
   );
@@ -176,11 +198,11 @@ function Card({ children, style: s = {}, onClick }) {
   return (
     <div onClick={onClick} style={{
       background: G.surface, border: `1.5px solid ${G.border}`, borderRadius: G.radius,
-      padding: 22, transition: "border-color 0.2s, box-shadow 0.2s",
+      padding: 22, transition: "border-color 0.2s, box-shadow 0.2s, transform 0.2s",
       cursor: onClick ? "pointer" : "default", ...s
     }}
-      onMouseEnter={e => { if (onClick) { e.currentTarget.style.borderColor = G.accent; e.currentTarget.style.boxShadow = `0 0 18px ${G.accentGlow}`; } }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = G.border; e.currentTarget.style.boxShadow = ""; }}>
+      onMouseEnter={e => { e.currentTarget.style.borderColor = G.accent; e.currentTarget.style.boxShadow = `0 0 18px ${G.accentGlow}`; e.currentTarget.style.transform = "translateY(-4px)"; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = G.border; e.currentTarget.style.boxShadow = ""; e.currentTarget.style.transform = ""; }}>
       {children}
     </div>
   );
@@ -215,7 +237,7 @@ function Navbar({ cartCount }) {
   const links = [
     { id: "home", label: "Home" },
     { id: "products", label: "Products" },
-    ...(isLoggedIn ? [{ id: "cart", label: "Cart" }, { id: "orders", label: "Orders" }] : []),
+    ...(isLoggedIn ? [{ id: "cart", label: "Cart" }, { id: "orders", label: "Orders" }, { id: "profile", label: "Profile" }] : []),
     ...(user?.role === "ADMIN" ? [{ id: "admin", label: "Admin" }] : []),
   ];
 
@@ -385,8 +407,13 @@ const [loading, setLoading] = useState(false);
           {mode === "register" && (
             <div><label>Username</label><input placeholder="johndoe" value={form.username} onChange={set("username")} /></div>
           )}
-          <div><label>Email</label><input type="email" placeholder="you@example.com" value={form.email} onChange={set("email")} /></div>
-          <div><label>Password</label><input type="password" placeholder="••••••••" value={form.password} onChange={set("password")} /></div>
+          {mode === "register" && (
+            <div><label>Email</label><input type="email" placeholder="you@example.com" value={form.email} onChange={set("email")} /></div>
+          )}
+          {mode === "login" && (
+            <div><label>Username</label><input placeholder="johndoe" value={form.username} onChange={set("username")} /></div>
+            )}          
+            <div><label>Password</label><input type="password" placeholder="••••••••" value={form.password} onChange={set("password")} /></div>
 
           <Btn style={{ width: "100%", justifyContent: "center", marginTop: 6 }} disabled={loading} onClick={submit}>
             {loading ? "Please wait…" : mode === "login" ? "Login" : "Register"}
@@ -400,6 +427,111 @@ const [loading, setLoading] = useState(false);
             {mode === "login" ? "Register" : "Login"}
           </span>
         </p>
+      </Card>
+    </div>
+  );
+}
+
+// ─── PROFILE PAGE ─────────────────────────────────────────────────────────
+function ProfilePage() {
+  const { user } = useAuth();
+  const api = useApi();
+  const toast = useToast();
+  const [profile, setProfile] = useState(null);
+  const [form, setForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await api.get("/api/users/profile");
+        setProfile(data);
+      } catch (err) { toast(err.message, "error"); }
+    })();
+  }, []);
+
+  const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
+
+  const changePassword = async () => {
+    if (form.newPassword !== form.confirmPassword) {
+      toast("New passwords don't match!", "error"); return;
+    }
+    if (form.newPassword.length < 6) {
+      toast("Password must be at least 6 characters!", "error"); return;
+    }
+    setLoading(true);
+    try {
+      await api.put("/api/users/change-password", {
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
+      });
+      toast("Password changed successfully! 🎉", "success");
+      setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) { toast(err.message, "error"); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{ maxWidth: 700, margin: "0 auto", padding: "40px 24px" }}>
+      <h1 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 32, marginBottom: 28 }}>👤 My Profile</h1>
+
+      {/* Profile Info */}
+      <Card style={{ marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 24 }}>
+          <div style={{
+            width: 70, height: 70, borderRadius: "50%", background: G.accent,
+            display: "grid", placeItems: "center", fontSize: 28, fontWeight: 800, color: "#fff",
+            fontFamily: "'Syne',sans-serif",
+          }}>
+            {(profile?.username || user?.username || "U")[0].toUpperCase()}
+          </div>
+          <div>
+            <h2 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 22 }}>
+              {profile?.username || user?.username}
+            </h2>
+            <Badge color={user?.role === "ADMIN" ? G.gold : G.success}>
+              {user?.role || "USER"}
+            </Badge>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "14px 18px" }}>
+            <div style={{ color: G.muted, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>USERNAME</div>
+            <div style={{ fontWeight: 600 }}>{profile?.username || user?.username || "—"}</div>
+          </div>
+          <div style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "14px 18px" }}>
+            <div style={{ color: G.muted, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>EMAIL</div>
+            <div style={{ fontWeight: 600 }}>{profile?.email || user?.email || "—"}</div>
+          </div>
+          <div style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "14px 18px" }}>
+            <div style={{ color: G.muted, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>ROLE</div>
+            <div style={{ fontWeight: 600 }}>{profile?.role || user?.role || "—"}</div>
+          </div>
+          <div style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "14px 18px" }}>
+            <div style={{ color: G.muted, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>MEMBER SINCE</div>
+            <div style={{ fontWeight: 600 }}>Cartify Member ✅</div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Change Password */}
+      <Card>
+        <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 18, marginBottom: 20 }}>🔒 Change Password</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div><label>Current Password</label>
+            <input type="password" placeholder="Enter current password" value={form.currentPassword} onChange={set("currentPassword")} />
+          </div>
+          <div><label>New Password</label>
+            <input type="password" placeholder="Enter new password" value={form.newPassword} onChange={set("newPassword")} />
+          </div>
+          <div><label>Confirm New Password</label>
+            <input type="password" placeholder="Confirm new password" value={form.confirmPassword} onChange={set("confirmPassword")} />
+          </div>
+          <Btn onClick={changePassword} disabled={loading} style={{ alignSelf: "flex-start" }}>
+            {loading ? "Updating…" : "Update Password 🔒"}
+          </Btn>
+        </div>
       </Card>
     </div>
   );
@@ -454,34 +586,71 @@ function ProductsPage() {
       </div>
 
       {loading ? <Spinner /> : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(250px,1fr))", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(250px,1fr))", gap: 20, alignItems: "stretch" }}>
           {filtered.length === 0 && (
             <p style={{ color: G.muted, gridColumn: "1/-1", textAlign: "center", padding: 40 }}>No products found.</p>
           )}
           {filtered.map((p, i) => (
-            <Card key={p.id || i} style={{ animation: `slideUp ${0.1 + i * 0.05}s ease both` }}>
-              <div style={{
-                height: "auto", minHeight: 200, maxHeight: 240, background: G.surfaceAlt, 
-                borderRadius: G.radiusSm, display: "grid", placeItems: "center", 
-                fontSize: 52, marginBottom: 16, overflow: "visible",
+            <div
+              key={p.id || i}
+              className="product-card"
+              style={{ borderRadius: G.radius }}
+            >
+              <Card onClick={() => {}} style={{ 
+                animation: `slideUp ${0.1 + i * 0.05}s ease both`, 
+                display: "flex", 
+                flexDirection: "column",
+                height: "100%"
               }}>
-                {p.imageUrl ? <img src={p.imageUrl} style={{ width: "100%", height: "auto", maxHeight: 240, objectFit: "contain", borderRadius: G.radiusSm, display: "block", padding: "8px"}} alt="" /> : "📦"}              
-              </div>
-              <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17, marginBottom: 6 }}>
-                {p.name || p.productName || "Unnamed Product"}
-              </h3>
-              <p style={{ color: G.muted, fontSize: 13, lineHeight: 1.5, marginBottom: 14, height: 40, overflow: "hidden" }}>
-                {p.description || "No description."}
-              </p>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20, color: G.accent }}>
-                  ₹{(p.price || 0).toLocaleString()}
-                </span>
-                <Btn size="sm" disabled={addingId === p.id} onClick={() => addToCart(p.id)}>
-                  {addingId === p.id ? "Adding…" : "Add to Cart"}
-                </Btn>
-              </div>
-            </Card>
+                {/* Image container - fixed height always */}
+                <div style={{
+                  minHeight: 200, maxHeight: 220, background: G.surfaceAlt, 
+                  borderRadius: G.radiusSm, display: "flex", alignItems: "center",
+                  justifyContent: "center", fontSize: 52, marginBottom: 16, flexShrink: 0,
+                  padding: "8px",
+                }}>
+                  {p.imageUrl
+                    ? <img src={p.imageUrl} style={{
+                        maxWidth: "100%",
+                        maxHeight: 200,
+                        objectFit: "contain",
+                        display: "block",
+                        borderRadius: G.radiusSm,
+                      }} alt="" />
+                    : "📦"
+                  }
+                </div>
+
+                {/* Name - fixed height */}
+                <h3 style={{
+                  fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17,
+                  marginBottom: 6, height: 48, overflow: "hidden",
+                  display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical"
+                }}>
+                  {p.name || p.productName || "Unnamed Product"}
+                </h3>
+
+                {/* Description - fixed height */}
+                <p style={{
+                  color: G.muted, fontSize: 13, lineHeight: 1.5, marginBottom: 14,
+                  height: 40, overflow: "hidden",
+                  display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                  flexGrow: 1  
+                }}>
+                  {p.description || "No description."}
+                </p>
+
+                {/* Price + Button - always at bottom */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto" }}>
+                  <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20, color: G.accent }}>
+                    ₹{(p.price || 0).toLocaleString()}
+                  </span>
+                  <Btn size="sm" disabled={addingId === p.id} onClick={() => addToCart(p.id)}>
+                    {addingId === p.id ? "Adding…" : "Add to cart"}
+                  </Btn>
+                </div>
+              </Card>
+            </div>
           ))}
         </div>
       )}
@@ -834,7 +1003,8 @@ function AdminPage() {
   );
 }
 
-// Orders Management Section
+// ─── ORDER MANAGEMENT PAGE ─────────────────────────────────────────────────────────────
+
 function AdminOrdersSection() {
   const api = useApi();
   const toast = useToast();
@@ -964,6 +1134,7 @@ function AppInner({ cartCount, setCartCount }) {
     products: <ProductsPage />,
     login: <AuthPage mode="login" />,
     register: <AuthPage mode="register" />,
+    profile: <Protected><ProfilePage /></Protected>,
     cart: <Protected><CartPage onCartChange={setCartCount} /></Protected>,
     orders: <Protected><OrdersPage /></Protected>,
     admin: <Protected>{user?.role === "ADMIN" ? <AdminPage /> : <div style={{ padding: 40, textAlign: "center", color: G.danger }}>Access Denied</div>}</Protected>,
