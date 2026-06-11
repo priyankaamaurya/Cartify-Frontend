@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
-const BASE_URL = "import.meta.env.VITE_API_URL";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // ─── AUTH CONTEXT ──────────────────────────────────────────────────────────
 const AuthContext = createContext(null);
