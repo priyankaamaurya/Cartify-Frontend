@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
-const BASE_URL = "https://e-commerce-backend-production-d6f0.up.railway.app";
+const BASE_URL = "import.meta.env.VITE_API_URL";
 
 // ─── AUTH CONTEXT ──────────────────────────────────────────────────────────
 const AuthContext = createContext(null);
@@ -32,7 +32,7 @@ function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
+} 
 
 // ─── API HELPER ────────────────────────────────────────────────────────────
 function useApi() {
