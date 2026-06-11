@@ -1,13 +1,13 @@
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "https://e-commerce-backend-production-d6f0.up.railway.app";
 
 // ─── AUTH CONTEXT ──────────────────────────────────────────────────────────
 const AuthContext = createContext(null);
 const useAuth = () => useContext(AuthContext);
 
-function AuthProvider({ children }) {
+function AuthProvider({ children }) { 
   const [token, setToken] = useState(() => localStorage.getItem("cartify_token"));
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("cartify_user")); } catch { return null; }
