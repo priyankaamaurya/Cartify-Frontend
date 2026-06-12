@@ -1,6 +1,6 @@
 # Cartify – Full Stack E-Commerce Application
 
-![Cartify Banner](https://images.unsplash.com/photo-1557821552-17105176677c?w=1200&h=400&fit=crop)
+![Cartify Banner](https://raw.githubusercontent.com/priyankaamaurya/Cartify-Frontend/master/screenshots/home.png)
 
 A full-stack e-commerce application built with **Spring Boot** (backend) and **React.js** (frontend), featuring JWT authentication, role-based access control, and real-time email notifications.
 
@@ -90,35 +90,53 @@ A full-stack e-commerce application built with **Spring Boot** (backend) and **R
 
 ```
 Cartify/
-├── backend/                    # Spring Boot Backend
-│   ├── controller/             # REST API Controllers
+├── backend/                                    # Spring Boot Backend
+│   ├── controller/                             # REST API Controllers
 │   │   ├── AuthController.java
 │   │   ├── ProductController.java
 │   │   ├── CartController.java
 │   │   ├── OrderController.java
 │   │   └── UserController.java
-│   ├── service/                # Business Logic
+│   ├── service/                                # Business Logic
 │   │   ├── AuthService.java
 │   │   ├── ProductService.java
 │   │   ├── CartService.java
 │   │   ├── OrderService.java
 │   │   ├── UserService.java
 │   │   └── EmailService.java
-│   ├── model/                  # JPA Entities
-│   │   ├── User.java
+│   ├── model/                                  # JPA Entities
+│   │   ├── User.java  
 │   │   ├── Product.java
 │   │   ├── CartItem.java
 │   │   ├── Order.java
 │   │   └── OrderItem.java
-│   ├── repository/             # Spring Data JPA Repos
-│   ├── security/               # JWT Filter & Util
-│   ├── config/                 # Security & Swagger Config
-│   ├── dto/                    # Data Transfer Objects
-│   └── exception/              # Global Exception Handler
-│
-└── frontend/                   # React.js Frontend
+│   ├── repository/                             # Spring Data JPA Repos
+│   │   ├── CartRepository.java
+│   │   ├── OrderRepository.java
+│   │   ├── ProductRepository.java
+│   │   └── UserRepository.java
+│   ├── security/                               # JWT Filter & Util
+│   │   ├── JwtAuthFilter.java
+│   │   └── JwtUtil.java
+│   ├── config/                                 # Security & Swagger Config
+│   │   ├── SecurityConfig.java
+│   │   └── SwaggerConfig.java
+│   ├── dto/                                    # Data Transfer Objects
+│   │   ├── ChangePasswordRequest.java
+│   │   ├── LoginRequest.java
+│   │   ├── OrderItemDTO.java
+│   │   ├── OrderItemRequest.java
+│   │   ├── OrderRequestDTO.java
+│   │   ├── OrderStatusRequest.java
+│   │   ├── ProductDTO.java
+│   │   └── RegisterRequest.java
+│   └── exception/                              # Global Exception Handler
+│   │   ├── GlobalExceptionHandler.java
+│   │   └── ResourceNotFoundException.java
+└── frontend/                                   # React.js Frontend
     └── src/
-        └── Cartify.jsx         # Main App (Single File)
+        ├── Cartify.jsx  
+        └── main.jsx                            # Main App (Single File)
 ```
 
 ---
@@ -254,16 +272,25 @@ Open **http://localhost:5173** 🎉
 ## Screenshots
 
 ### Home Page
-![Home](https://images.unsplash.com/photo-1557821552-17105176677c?w=800&h=400&fit=crop)
+![Home](https://raw.githubusercontent.com/priyankaamaurya/Cartify-Frontend/master/screenshots/home.png)
 
 ### Products Page
-Browse products with images, search functionality and hover effects.
+![Products](https://raw.githubusercontent.com/priyankaamaurya/Cartify-Frontend/master/screenshots/products.png)
 
 ### Cart Page
-Manage cart items with quantity controls and order summary.
+![Cart](https://raw.githubusercontent.com/priyankaamaurya/Cartify-Frontend/master/screenshots/cart.png)
+
+### Order Page
+![Order](https://raw.githubusercontent.com/priyankaamaurya/Cartify-Frontend/master/screenshots/orders.png)
 
 ### Admin Panel
-Add/edit/delete products and manage all orders with status updates.
+![Admin](https://raw.githubusercontent.com/priyankaamaurya/Cartify-Frontend/master/screenshots/profile.png)
+
+### Swagger UI
+![Swagger](https://raw.githubusercontent.com/priyankaamaurya/Cartify-Frontend/master/screenshots/swagger.png)
+
+### Postman
+![Postman](https://raw.githubusercontent.com/priyankaamaurya/Cartify-Frontend/master/screenshots/postman.png)
 
 ---
 
