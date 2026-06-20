@@ -11,8 +11,8 @@ A full-stack e-commerce application built with **Spring Boot** (backend) and **R
 | Service | URL |
 |---------|-----|
 | Frontend | [cartify-frontend-28x5-priyankaamauryas-projects.vercel.app](https://cartify-frontend-28x5-priyankaamauryas-projects.vercel.app) |
-| Backend API | [e-commerce-backend-production-d6f0.up.railway.app](https://e-commerce-backend-production-d6f0.up.railway.app) |
-| Swagger UI | [Swagger Docs](https://e-commerce-backend-production-d6f0.up.railway.app/swagger-ui/index.html) |
+| Backend API | [e-commerce-backend-production-d6f0.up.railway.app](https://e-commerce-backend-omnx.onrender.com) |
+| Swagger UI | [Swagger Docs](https://e-commerce-backend-omnx.onrender.com/swagger-ui/index.html) |
 
 ---
 
@@ -81,7 +81,8 @@ A full-stack e-commerce application built with **Spring Boot** (backend) and **R
 **Deployment:**
 | Service | Purpose |
 |---------|---------|
-| Railway | Backend + PostgreSQL Hosting |
+| Render  | Backend Hosting (Docker)  |
+| Neon  | PostgreSQL Database |
 | Vercel | Frontend Hosting |
 
 ---
