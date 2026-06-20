@@ -11,7 +11,7 @@ A full-stack e-commerce application built with **Spring Boot** (backend) and **R
 | Service | URL |
 |---------|-----|
 | Frontend | [cartify-frontend-28x5-priyankaamauryas-projects.vercel.app](https://cartify-frontend-28x5-priyankaamauryas-projects.vercel.app) |
-| Backend API | [e-commerce-backend-production-d6f0.up.railway.app](https://e-commerce-backend-omnx.onrender.com) |
+| Backend API | [e-commerce-backend-omnx.onrender.com](https://e-commerce-backend-omnx.onrender.com/api/products) |
 | Swagger UI | [Swagger Docs](https://e-commerce-backend-omnx.onrender.com/swagger-ui/index.html) |
 
 ---
