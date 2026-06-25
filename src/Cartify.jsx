@@ -1158,7 +1158,6 @@
 
 
 
-
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
@@ -1397,12 +1396,12 @@ const css = `
 
   @media (max-width: 480px) {
     .products-grid { grid-template-columns: repeat(2, 1fr) !important; }
-    .product-img-box { min-height: 120px !important; max-height: 140px !important; }
+    .product-img-box { padding-top: 70% !important; }
     .product-price-row { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
     .product-price-row button { width: 100% !important; justify-content: center !important; }
     .product-name { font-size: 13px !important; height: auto !important; min-height: 36px !important; }
     .product-desc { font-size: 12px !important; height: auto !important; min-height: 32px !important; }
-    .products-grid .product-card > div { padding: 12px !important; }
+    .products-grid .product-card > div { padding: 10px !important; }
   }
 `;
 
@@ -1889,22 +1888,31 @@ function ProductsPage() {
                 flexDirection: "column",
                 height: "100%"
               }}>
-                {/* Image container - fixed height always */}
+                {/* Image container */}
                 <div className="product-img-box" style={{
-                  minHeight: 160, maxHeight: 180, background: G.surfaceAlt, 
-                  borderRadius: G.radiusSm, display: "flex", alignItems: "center",
-                  justifyContent: "center", fontSize: 52, marginBottom: 12, flexShrink: 0,
-                  padding: "8px",
+                  width: "100%",
+                  paddingTop: "65%", /* aspect ratio trick */
+                  position: "relative",
+                  background: G.surfaceAlt,
+                  borderRadius: G.radiusSm,
+                  marginBottom: 12,
+                  flexShrink: 0,
+                  overflow: "hidden",
                 }}>
                   {p.imageUrl
                     ? <img src={p.imageUrl} style={{
-                        maxWidth: "100%",
-                        maxHeight: 200,
-                        objectFit: "contain",
+                        position: "absolute",
+                        top: 0, left: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: "center",
                         display: "block",
-                        borderRadius: G.radiusSm,
                       }} alt="" />
-                    : "📦"
+                    : <span style={{
+                        position: "absolute", top: "50%", left: "50%",
+                        transform: "translate(-50%,-50%)", fontSize: 48,
+                      }}>📦</span>
                   }
                 </div>
 
