@@ -1890,7 +1890,7 @@ function ProductsPage() {
                 {/* Image container */}
                 <div className="product-img-box" style={{
                   width: "100%",
-                  paddingTop: "65%",
+                  paddingTop: "75%",
                   position: "relative",
                   background: G.surfaceAlt,
                   borderRadius: G.radiusSm,
