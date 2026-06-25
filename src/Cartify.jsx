@@ -1156,7 +1156,6 @@
 
 
 
-
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
@@ -1936,11 +1935,11 @@ function ProductsPage() {
                 </p>
 
                 {/* Price + Button - always at bottom */}
-                <div className="product-price-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", gap: 6 }}>
-                  <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20, color: G.accent }}>
+                <div className="product-price-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", gap: 8, flexWrap: "nowrap" }}>
+                  <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 17, color: G.accent, flexShrink: 0 }}>
                     ₹{(p.price || 0).toLocaleString()}
                   </span>
-                  <Btn size="sm" disabled={addingId === p.id} onClick={() => addToCart(p.id)}>
+                  <Btn size="sm" disabled={addingId === p.id} onClick={() => addToCart(p.id)} style={{ flexShrink: 0, whiteSpace: "nowrap" }}>
                     {addingId === p.id ? "Adding…" : "Add to cart"}
                   </Btn>
                 </div>
