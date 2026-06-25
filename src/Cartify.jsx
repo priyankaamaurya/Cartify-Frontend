@@ -1157,7 +1157,6 @@
 
 
 
-
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
@@ -1891,7 +1890,7 @@ function ProductsPage() {
                 {/* Image container */}
                 <div className="product-img-box" style={{
                   width: "100%",
-                  paddingTop: "65%", /* aspect ratio trick */
+                  paddingTop: "65%",
                   position: "relative",
                   background: G.surfaceAlt,
                   borderRadius: G.radiusSm,
@@ -1902,10 +1901,11 @@ function ProductsPage() {
                   {p.imageUrl
                     ? <img src={p.imageUrl} style={{
                         position: "absolute",
-                        top: 0, left: 0,
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
+                        top: "50%", left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: "90%",
+                        height: "90%",
+                        objectFit: "contain",
                         objectPosition: "center",
                         display: "block",
                       }} alt="" />
