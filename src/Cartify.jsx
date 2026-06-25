@@ -1160,7 +1160,6 @@
 
 
 
-
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
@@ -1240,7 +1239,7 @@ function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={addToast}>
       {children}
-      <div style={{ position: "fixed", bottom: 20, right: 16, zIndex: 9999, display: "flex", flexDirection: "column", gap: 10, maxWidth: "calc(100vw - 32px)" }}>
+      <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 9999, display: "flex", flexDirection: "column", gap: 10 }}>
         {toasts.map(t => (
           <div key={t.id} style={{
             padding: "13px 22px", borderRadius: 10, fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
@@ -1298,7 +1297,6 @@ const css = `
   @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
   @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
   @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.04);} }
-  @keyframes spin { to { transform: rotate(360deg); } }
   input, textarea, select {
     background: ${G.surfaceAlt}; border: 1.5px solid ${G.border};
     color: ${G.text}; border-radius: ${G.radiusSm}px; padding: 11px 15px;
@@ -1309,25 +1307,43 @@ const css = `
   label { display: block; font-size: 13px; color: ${G.muted}; margin-bottom: 5px; font-weight: 600; letter-spacing:.5px; }
   ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: ${G.surface}; }
   ::-webkit-scrollbar-thumb { background: ${G.border}; border-radius: 6px; }
-  .product-card { transition: transform 0.15s ease, box-shadow 0.2s ease !important; }
-  .product-card:hover { transform: translateY(-4px) !important; box-shadow: 0 0 20px ${G.accentGlow} !important; }
+  .product-card {
+    transition: transform 0.15s ease, box-shadow 0.2s ease !important;
+  }
+  .product-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 0 20px ${G.accentGlow} !important;
+  }
 
-  /* ── Responsive ── */
-  .nav-links { display: flex; gap: 4px; }
-  .nav-right { display: flex; gap: 10px; align-items: center; }
-  .nav-user-label { font-size: 13px; color: ${G.muted}; }
-  .hamburger { display: none; }
+  /* ─── RESPONSIVE ─── */
+
+  /* Hamburger hidden on desktop */
+  .hamburger-btn { display: none; }
+  /* Mobile menu hidden by default */
   .mobile-menu { display: none; }
 
-  .cart-grid { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
-  .admin-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
   @media (max-width: 768px) {
-    .nav-links { display: none; }
-    .nav-right { display: none; }
-    .nav-user-label { display: none; }
-    .hamburger { display: flex; align-items: center; justify-content: center; background: transparent; border: 1.5px solid ${G.border}; color: ${G.text}; border-radius: ${G.radiusSm}px; width: 40px; height: 40px; cursor: pointer; font-size: 20px; flex-shrink: 0; }
+    /* Hide desktop nav links and right section */
+    .desktop-nav-links { display: none !important; }
+    .desktop-nav-right { display: none !important; }
+
+    /* Show hamburger */
+    .hamburger-btn {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1.5px solid ${G.border};
+      color: ${G.text};
+      border-radius: ${G.radiusSm}px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    /* Show mobile menu when open */
     .mobile-menu {
       display: flex;
       flex-direction: column;
@@ -1336,50 +1352,53 @@ const css = `
       background: rgba(10,10,15,0.98);
       backdrop-filter: blur(18px);
       border-bottom: 1px solid ${G.border};
-      padding: 12px 16px 20px;
-      gap: 4px;
+      padding: 10px 16px 18px;
+      gap: 2px;
       z-index: 99;
       animation: slideUp 0.2s ease;
     }
-    .mobile-menu.hidden { display: none; }
+    .mobile-menu.closed { display: none; }
+
     .mobile-menu-btn {
-      background: transparent; color: ${G.muted}; border: none;
-      padding: 12px 14px; border-radius: ${G.radiusSm}px; cursor: pointer;
-      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px;
-      text-align: left; transition: all 0.15s;
+      background: transparent;
+      color: ${G.muted};
+      border: none;
+      padding: 12px 14px;
+      border-radius: ${G.radiusSm}px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      text-align: left;
+      transition: all 0.15s;
     }
-    .mobile-menu-btn:hover, .mobile-menu-btn.active { background: ${G.accentSoft}; color: ${G.accent}; }
-    .mobile-menu-divider { height: 1px; background: ${G.border}; margin: 8px 0; }
-    .mobile-menu-user { padding: 8px 14px; font-size: 13px; color: ${G.muted}; }
+    .mobile-menu-btn:hover { background: ${G.accentSoft}; color: ${G.accent}; }
+    .mobile-menu-btn.active { background: ${G.accentSoft}; color: ${G.accent}; }
+    .mobile-menu-divider { height: 1px; background: ${G.border}; margin: 6px 0; }
+    .mobile-menu-user { padding: 6px 14px; font-size: 13px; color: ${G.muted}; }
 
-    .cart-grid { grid-template-columns: 1fr; }
-    .cart-summary-sticky { position: static !important; }
+    /* Cart page: stack items + summary vertically */
+    .cart-layout { grid-template-columns: 1fr !important; }
+    .cart-summary { position: static !important; }
 
-    .admin-form-grid { grid-template-columns: 1fr; }
-    .admin-form-grid .full-col { grid-column: 1 !important; }
+    /* Admin form: single column */
+    .admin-form-grid { grid-template-columns: 1fr !important; }
+    .admin-form-grid .span-2 { grid-column: 1 !important; }
 
-    .profile-grid { grid-template-columns: 1fr; }
+    /* Profile grid: single column */
+    .profile-info-grid { grid-template-columns: 1fr !important; }
 
-    .hero-h1 { font-size: clamp(34px, 10vw, 60px) !important; }
-    .hero-btns { flex-direction: column; align-items: stretch; }
-    .hero-btns button { justify-content: center; }
-
-    .products-header { flex-direction: column; align-items: flex-start !important; }
+    /* Products header: stack */
+    .products-header { flex-direction: column !important; align-items: flex-start !important; }
     .products-header input { width: 100% !important; }
 
-    .cart-item-card { flex-wrap: wrap; gap: 12px; }
-    .cart-item-image { width: 56px !important; height: 56px !important; }
-    .cart-item-actions { width: 100%; display: flex; justify-content: space-between; align-items: center; }
-
-    .order-header { flex-direction: column; align-items: flex-start !important; gap: 8px; }
-
-    .page-pad { padding: 28px 16px !important; }
-    .admin-page-pad { padding: 28px 16px !important; }
+    /* Page padding */
+    .page-wrap { padding-left: 16px !important; padding-right: 16px !important; }
   }
 
   @media (max-width: 480px) {
-    .features-grid { grid-template-columns: 1fr 1fr !important; }
-    .products-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important; }
+    /* Even smaller screens: 2-col product grid */
+    .products-grid { grid-template-columns: repeat(2, 1fr) !important; }
   }
 `;
 
@@ -1401,8 +1420,18 @@ function Btn({ children, onClick, variant = "primary", size = "md", style: s = {
   return (
     <button type={type} onClick={onClick} disabled={disabled}
       style={{ ...base, ...sizes[size], ...variants[variant], ...s }}
-      onMouseEnter={e => { if (!disabled) { e.currentTarget.style.filter = "brightness(1.15)"; e.currentTarget.style.boxShadow = `0 0 14px ${G.accentGlow}`; e.currentTarget.style.transform = "translateY(-2px)"; } }}
-      onMouseLeave={e => { e.currentTarget.style.filter = ""; e.currentTarget.style.boxShadow = ""; e.currentTarget.style.transform = ""; }}>
+      onMouseEnter={e => { 
+        if (!disabled) { 
+          e.currentTarget.style.filter = "brightness(1.15)"; 
+          e.currentTarget.style.boxShadow = `0 0 14px ${G.accentGlow}`;
+          e.currentTarget.style.transform = "translateY(-2px)";
+        }
+      }}
+      onMouseLeave={e => { 
+        e.currentTarget.style.filter = ""; 
+        e.currentTarget.style.boxShadow = "";
+        e.currentTarget.style.transform = "";
+      }}>
       {children}
     </button>
   );
@@ -1425,7 +1454,11 @@ function Card({ children, style: s = {}, onClick }) {
 function Spinner() {
   return (
     <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
-      <div style={{ width: 36, height: 36, border: `3px solid ${G.border}`, borderTopColor: G.accent, borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+      <div style={{
+        width: 36, height: 36, border: `3px solid ${G.border}`, borderTopColor: G.accent,
+        borderRadius: "50%", animation: "spin 0.7s linear infinite"
+      }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
@@ -1448,23 +1481,22 @@ function Navbar({ cartCount }) {
   const links = [
     { id: "home", label: "Home" },
     { id: "products", label: "Products" },
-    ...(isLoggedIn ? [{ id: "cart", label: `Cart${cartCount > 0 ? ` (${cartCount})` : ""}` }, { id: "orders", label: "Orders" }, { id: "profile", label: "Profile" }] : []),
+    ...(isLoggedIn ? [{ id: "cart", label: "Cart" }, { id: "orders", label: "Orders" }, { id: "profile", label: "Profile" }] : []),
     ...(user?.role === "ADMIN" ? [{ id: "admin", label: "Admin" }] : []),
   ];
 
   const go = (id) => { navigate(id); setMenuOpen(false); };
-  const doLogout = () => { logout(); setMenuOpen(false); };
 
   return (
     <>
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
         background: "rgba(10,10,15,0.88)", backdropFilter: "blur(18px)",
-        borderBottom: `1px solid ${G.border}`, padding: "0 20px",
+        borderBottom: `1px solid ${G.border}`, padding: "0 32px",
         display: "flex", alignItems: "center", justifyContent: "space-between", height: 64,
       }}>
         {/* Logo */}
-        <div onClick={() => go("home")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+        <div onClick={() => go("home")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 32, height: 32, background: G.accent, borderRadius: 8, display: "grid", placeItems: "center", fontSize: 18 }}>🛒</div>
           <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22, letterSpacing: "-0.5px", color: G.text }}>
             Cart<span style={{ color: G.accent }}>ify</span>
@@ -1472,7 +1504,7 @@ function Navbar({ cartCount }) {
         </div>
 
         {/* Desktop nav links */}
-        <div className="nav-links">
+        <div className="desktop-nav-links" style={{ display: "flex", gap: 4 }}>
           {links.map(l => (
             <button key={l.id} onClick={() => go(l.id)} style={{
               background: page === l.id ? G.accentSoft : "transparent",
@@ -1494,11 +1526,11 @@ function Navbar({ cartCount }) {
         </div>
 
         {/* Desktop right */}
-        <div className="nav-right">
+        <div className="desktop-nav-right" style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {isLoggedIn ? (
             <>
-              <span className="nav-user-label">Hi, <b style={{ color: G.text }}>{user?.username || user?.name}</b></span>
-              <Btn variant="ghost" size="sm" onClick={doLogout}>Logout</Btn>
+              <span style={{ fontSize: 13, color: G.muted }}>Hi, <b style={{ color: G.text }}>{user?.username || user?.name}</b></span>
+              <Btn variant="ghost" size="sm" onClick={logout}>Logout</Btn>
             </>
           ) : (
             <>
@@ -1508,34 +1540,35 @@ function Navbar({ cartCount }) {
           )}
         </div>
 
-        {/* Hamburger (mobile) */}
-        <button className="hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="Menu">
+        {/* Hamburger — mobile only */}
+        <button className="hamburger-btn" onClick={() => setMenuOpen(o => !o)} aria-label="Toggle menu">
           {menuOpen ? "✕" : "☰"}
         </button>
       </nav>
 
-      {/* Mobile menu */}
-      <div className={`mobile-menu${menuOpen ? "" : " hidden"}`}>
+      {/* Mobile dropdown menu */}
+      <div className={`mobile-menu${menuOpen ? "" : " closed"}`}>
         {links.map(l => (
           <button key={l.id} className={`mobile-menu-btn${page === l.id ? " active" : ""}`} onClick={() => go(l.id)}>
-            {l.id === "cart" ? `🛒 Cart${cartCount > 0 ? ` (${cartCount})` : ""}` :
-             l.id === "home" ? "🏠 Home" :
-             l.id === "products" ? "📦 Products" :
-             l.id === "orders" ? "📋 Orders" :
-             l.id === "profile" ? "👤 Profile" :
-             l.id === "admin" ? "⚙️ Admin" : l.label}
+            {l.id === "home" && "🏠 "}
+            {l.id === "products" && "📦 "}
+            {l.id === "cart" && `🛒 `}
+            {l.id === "orders" && "📋 "}
+            {l.id === "profile" && "👤 "}
+            {l.id === "admin" && "⚙️ "}
+            {l.label}{l.id === "cart" && cartCount > 0 ? ` (${cartCount})` : ""}
           </button>
         ))}
         <div className="mobile-menu-divider" />
         {isLoggedIn ? (
           <>
             <div className="mobile-menu-user">Signed in as <b style={{ color: G.text }}>{user?.username}</b></div>
-            <button className="mobile-menu-btn" onClick={doLogout} style={{ color: G.danger }}>🚪 Logout</button>
+            <button className="mobile-menu-btn" style={{ color: G.danger }} onClick={() => { logout(); setMenuOpen(false); }}>🚪 Logout</button>
           </>
         ) : (
           <>
             <button className="mobile-menu-btn" onClick={() => go("login")}>🔑 Login</button>
-            <button className="mobile-menu-btn" onClick={() => go("register")} style={{ color: G.accent }}>✨ Register</button>
+            <button className="mobile-menu-btn" style={{ color: G.accent }} onClick={() => go("register")}>✨ Register</button>
           </>
         )}
       </div>
@@ -1556,29 +1589,29 @@ function HomePage() {
   ];
 
   return (
-    <div className="page-pad" style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
+    <div className="page-wrap" style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
       {/* Hero */}
-      <div style={{ textAlign: "center", marginBottom: 70, animation: "fadeIn 0.7s ease" }}>
+      <div style={{ textAlign: "center", marginBottom: 80, animation: "fadeIn 0.7s ease" }}>
         <div style={{
           display: "inline-block", background: G.accentSoft, border: `1px solid ${G.accent}44`,
           borderRadius: 20, padding: "5px 18px", fontSize: 13, color: G.accent,
           fontWeight: 700, marginBottom: 22, letterSpacing: 1,
         }}>⚡ Full-Stack E-Commerce</div>
 
-        <h1 className="hero-h1" style={{
+        <h1 style={{
           fontFamily: "'Syne', sans-serif", fontWeight: 800,
-          fontSize: "clamp(36px, 7vw, 80px)", lineHeight: 1.05,
+          fontSize: "clamp(42px, 7vw, 80px)", lineHeight: 1.05,
           letterSpacing: "-2px", marginBottom: 22,
         }}>
           Shop Smarter with<br />
           <span style={{ color: G.accent, textShadow: `0 0 60px ${G.accentGlow}` }}>Cartify</span>
         </h1>
 
-        <p style={{ color: G.muted, fontSize: 17, maxWidth: 520, margin: "0 auto 36px", lineHeight: 1.7 }}>
+        <p style={{ color: G.muted, fontSize: 18, maxWidth: 520, margin: "0 auto 36px", lineHeight: 1.7 }}>
           A secure, scalable e-commerce platform powered by Spring Boot & JWT authentication.
         </p>
 
-        <div className="hero-btns" style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
           <Btn size="lg" onClick={() => navigate("products")}>Browse Products →</Btn>
           {!isLoggedIn && (
             <Btn size="lg" variant="ghost" onClick={() => navigate("register")}>Create Account</Btn>
@@ -1587,7 +1620,7 @@ function HomePage() {
       </div>
 
       {/* Features */}
-      <div className="features-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 20 }}>
         {features.map((f, i) => (
           <Card key={i} style={{ textAlign: "center", animation: `slideUp ${0.3 + i * 0.1}s ease both` }}>
             <div style={{ fontSize: 36, marginBottom: 14 }}>{f.icon}</div>
@@ -1597,7 +1630,11 @@ function HomePage() {
         ))}
       </div>
 
-      <div style={{ margin: "70px auto 0", height: 1, maxWidth: 400, background: `linear-gradient(90deg, transparent, ${G.accent}, transparent)` }} />
+      {/* Decorative divider */}
+      <div style={{
+        margin: "70px auto 0", height: 1, maxWidth: 400,
+        background: `linear-gradient(90deg, transparent, ${G.accent}, transparent)`
+      }} />
     </div>
   );
 }
@@ -1608,8 +1645,9 @@ function AuthPage({ mode }) {
   const { login } = useAuth();
   const toast = useToast();
   const api = useApi();
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
-  const [loading, setLoading] = useState(false);
+
+const [form, setForm] = useState({ username: "", email: "", password: "" });
+const [loading, setLoading] = useState(false);
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
@@ -1622,6 +1660,7 @@ function AuthPage({ mode }) {
         navigate("login");
       } else {
         const data = await api.post("/api/auth/login", { username: form.username, password: form.password });
+        // data may be { token, role, email } or { jwt, ... } – adapt as needed
         const tok = data.token || data.jwt || data.accessToken || data;
         login(tok, { username: form.username, email: form.email, role: data.role, name: form.username });
         toast("Welcome back!", "success");
@@ -1635,7 +1674,7 @@ function AuthPage({ mode }) {
   };
 
   return (
-    <div style={{ minHeight: "85vh", display: "grid", placeItems: "center", padding: 20 }}>
+    <div style={{ minHeight: "85vh", display: "grid", placeItems: "center", padding: 24 }}>
       <Card style={{ width: "100%", maxWidth: 420, animation: "slideUp 0.4s ease" }}>
         <div style={{ textAlign: "center", marginBottom: 30 }}>
           <div style={{ fontSize: 40, marginBottom: 10 }}>{mode === "login" ? "🔑" : "✨"}</div>
@@ -1656,8 +1695,8 @@ function AuthPage({ mode }) {
           )}
           {mode === "login" && (
             <div><label>Username</label><input placeholder="johndoe" value={form.username} onChange={set("username")} /></div>
-          )}
-          <div><label>Password</label><input type="password" placeholder="••••••••" value={form.password} onChange={set("password")} /></div>
+            )}          
+            <div><label>Password</label><input type="password" placeholder="••••••••" value={form.password} onChange={set("password")} /></div>
 
           <Btn style={{ width: "100%", justifyContent: "center", marginTop: 6 }} disabled={loading} onClick={submit}>
             {loading ? "Please wait…" : mode === "login" ? "Login" : "Register"}
@@ -1697,11 +1736,18 @@ function ProfilePage() {
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
 
   const changePassword = async () => {
-    if (form.newPassword !== form.confirmPassword) { toast("New passwords don't match!", "error"); return; }
-    if (form.newPassword.length < 6) { toast("Password must be at least 6 characters!", "error"); return; }
+    if (form.newPassword !== form.confirmPassword) {
+      toast("New passwords don't match!", "error"); return;
+    }
+    if (form.newPassword.length < 6) {
+      toast("Password must be at least 6 characters!", "error"); return;
+    }
     setLoading(true);
     try {
-      await api.put("/api/users/change-password", { currentPassword: form.currentPassword, newPassword: form.newPassword });
+      await api.put("/api/users/change-password", {
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
+      });
       toast("Password changed successfully! 🎉", "success");
       setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) { toast(err.message, "error"); }
@@ -1709,15 +1755,16 @@ function ProfilePage() {
   };
 
   return (
-    <div className="page-pad" style={{ maxWidth: 700, margin: "0 auto", padding: "40px 24px" }}>
+    <div className="page-wrap" style={{ maxWidth: 700, margin: "0 auto", padding: "40px 24px" }}>
       <h1 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 32, marginBottom: 28 }}>👤 My Profile</h1>
 
+      {/* Profile Info */}
       <Card style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 24, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 24 }}>
           <div style={{
             width: 70, height: 70, borderRadius: "50%", background: G.accent,
             display: "grid", placeItems: "center", fontSize: 28, fontWeight: 800, color: "#fff",
-            fontFamily: "'Syne',sans-serif", flexShrink: 0,
+            fontFamily: "'Syne',sans-serif",
           }}>
             {(profile?.username || user?.username || "U")[0].toUpperCase()}
           </div>
@@ -1725,31 +1772,45 @@ function ProfilePage() {
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 22 }}>
               {profile?.username || user?.username}
             </h2>
-            <Badge color={user?.role === "ADMIN" ? G.gold : G.success}>{user?.role || "USER"}</Badge>
+            <Badge color={user?.role === "ADMIN" ? G.gold : G.success}>
+              {user?.role || "USER"}
+            </Badge>
           </div>
         </div>
 
-        <div className="profile-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          {[
-            { label: "USERNAME", value: profile?.username || user?.username || "—" },
-            { label: "EMAIL", value: profile?.email || user?.email || "—" },
-            { label: "ROLE", value: profile?.role || user?.role || "—" },
-            { label: "MEMBER SINCE", value: "Cartify Member ✅" },
-          ].map(({ label, value }) => (
-            <div key={label} style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "14px 18px" }}>
-              <div style={{ color: G.muted, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>{label}</div>
-              <div style={{ fontWeight: 600, wordBreak: "break-all" }}>{value}</div>
-            </div>
-          ))}
+        <div className="profile-info-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "14px 18px" }}>
+            <div style={{ color: G.muted, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>USERNAME</div>
+            <div style={{ fontWeight: 600 }}>{profile?.username || user?.username || "—"}</div>
+          </div>
+          <div style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "14px 18px" }}>
+            <div style={{ color: G.muted, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>EMAIL</div>
+            <div style={{ fontWeight: 600 }}>{profile?.email || user?.email || "—"}</div>
+          </div>
+          <div style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "14px 18px" }}>
+            <div style={{ color: G.muted, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>ROLE</div>
+            <div style={{ fontWeight: 600 }}>{profile?.role || user?.role || "—"}</div>
+          </div>
+          <div style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "14px 18px" }}>
+            <div style={{ color: G.muted, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>MEMBER SINCE</div>
+            <div style={{ fontWeight: 600 }}>Cartify Member ✅</div>
+          </div>
         </div>
       </Card>
 
+      {/* Change Password */}
       <Card>
         <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 18, marginBottom: 20 }}>🔒 Change Password</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div><label>Current Password</label><input type="password" placeholder="Enter current password" value={form.currentPassword} onChange={set("currentPassword")} /></div>
-          <div><label>New Password</label><input type="password" placeholder="Enter new password" value={form.newPassword} onChange={set("newPassword")} /></div>
-          <div><label>Confirm New Password</label><input type="password" placeholder="Confirm new password" value={form.confirmPassword} onChange={set("confirmPassword")} /></div>
+          <div><label>Current Password</label>
+            <input type="password" placeholder="Enter current password" value={form.currentPassword} onChange={set("currentPassword")} />
+          </div>
+          <div><label>New Password</label>
+            <input type="password" placeholder="Enter new password" value={form.newPassword} onChange={set("newPassword")} />
+          </div>
+          <div><label>Confirm New Password</label>
+            <input type="password" placeholder="Confirm new password" value={form.confirmPassword} onChange={set("confirmPassword")} />
+          </div>
           <Btn onClick={changePassword} disabled={loading} style={{ alignSelf: "flex-start" }}>
             {loading ? "Updating…" : "Update Password 🔒"}
           </Btn>
@@ -1774,8 +1835,9 @@ function ProductsPage() {
     try {
       const data = await api.get("/api/products");
       setProducts(Array.isArray(data) ? data : data.content || []);
-    } catch (err) { toast(err.message, "error"); }
-    finally { setLoading(false); }
+    } catch (err) {
+      toast(err.message, "error");
+    } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { load(); }, []);
@@ -1796,7 +1858,7 @@ function ProductsPage() {
   );
 
   return (
-    <div className="page-pad" style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px" }}>
+    <div className="page-wrap" style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px" }}>
       <div className="products-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30, flexWrap: "wrap", gap: 14 }}>
         <div>
           <h1 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 32 }}>Products</h1>
@@ -1807,41 +1869,63 @@ function ProductsPage() {
       </div>
 
       {loading ? <Spinner /> : (
-        <div className="products-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: 20, alignItems: "stretch" }}>
+        <div className="products-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(250px,1fr))", gap: 20, alignItems: "stretch" }}>
           {filtered.length === 0 && (
             <p style={{ color: G.muted, gridColumn: "1/-1", textAlign: "center", padding: 40 }}>No products found.</p>
           )}
           {filtered.map((p, i) => (
-            <div key={p.id || i} className="product-card" style={{ borderRadius: G.radius }}>
-              <Card style={{ animation: `slideUp ${0.1 + i * 0.05}s ease both`, display: "flex", flexDirection: "column", height: "100%" }}>
+            <div
+              key={p.id || i}
+              className="product-card"
+              style={{ borderRadius: G.radius }}
+            >
+              <Card onClick={() => {}} style={{ 
+                animation: `slideUp ${0.1 + i * 0.05}s ease both`, 
+                display: "flex", 
+                flexDirection: "column",
+                height: "100%"
+              }}>
+                {/* Image container - fixed height always */}
                 <div style={{
-                  minHeight: 180, maxHeight: 200, background: G.surfaceAlt,
+                  minHeight: 200, maxHeight: 220, background: G.surfaceAlt, 
                   borderRadius: G.radiusSm, display: "flex", alignItems: "center",
-                  justifyContent: "center", fontSize: 52, marginBottom: 16, flexShrink: 0, padding: "8px",
+                  justifyContent: "center", fontSize: 52, marginBottom: 16, flexShrink: 0,
+                  padding: "8px",
                 }}>
                   {p.imageUrl
-                    ? <img src={p.imageUrl} style={{ maxWidth: "100%", maxHeight: 180, objectFit: "contain", display: "block", borderRadius: G.radiusSm }} alt="" />
-                    : "📦"}
+                    ? <img src={p.imageUrl} style={{
+                        maxWidth: "100%",
+                        maxHeight: 200,
+                        objectFit: "contain",
+                        display: "block",
+                        borderRadius: G.radiusSm,
+                      }} alt="" />
+                    : "📦"
+                  }
                 </div>
 
+                {/* Name - fixed height */}
                 <h3 style={{
-                  fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 16,
-                  marginBottom: 6, height: 46, overflow: "hidden",
+                  fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17,
+                  marginBottom: 6, height: 48, overflow: "hidden",
                   display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical"
                 }}>
                   {p.name || p.productName || "Unnamed Product"}
                 </h3>
 
+                {/* Description - fixed height */}
                 <p style={{
                   color: G.muted, fontSize: 13, lineHeight: 1.5, marginBottom: 14,
                   height: 40, overflow: "hidden",
-                  display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", flexGrow: 1
+                  display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                  flexGrow: 1  
                 }}>
                   {p.description || "No description."}
                 </p>
 
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", gap: 8, flexWrap: "wrap" }}>
-                  <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 19, color: G.accent }}>
+                {/* Price + Button - always at bottom */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto" }}>
+                  <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20, color: G.accent }}>
                     ₹{(p.price || 0).toLocaleString()}
                   </span>
                   <Btn size="sm" disabled={addingId === p.id} onClick={() => addToCart(p.id)}>
@@ -1880,14 +1964,23 @@ function CartPage({ onCartChange }) {
   useEffect(() => { load(); }, []);
 
   const remove = async (id) => {
-    try { await api.del(`/api/cart/${id}`); toast("Removed from cart", "success"); load(); }
-    catch (err) { toast(err.message, "error"); }
+    try {
+      await api.del(`/api/cart/${id}`);
+      toast("Removed from cart", "success");
+      load();
+    } catch (err) { toast(err.message, "error"); }
   };
 
   const updateQty = async (id, newQty) => {
-    if (newQty < 1) { await remove(id); return; }
-    try { await api.put(`/api/cart/update?itemId=${id}&quantity=${newQty}`); load(); }
-    catch (err) { toast(err.message, "error"); }
+    if (newQty < 1) {
+      // If quantity goes to 0, remove the item
+      await remove(id);
+      return;
+    }
+    try {
+      await api.put(`/api/cart/update?itemId=${id}&quantity=${newQty}`);
+      load(); // reload cart
+    } catch (err) { toast(err.message, "error"); }
   };
 
   const placeOrder = async () => {
@@ -1904,7 +1997,7 @@ function CartPage({ onCartChange }) {
       navigate("orders");
     } catch (err) { toast(err.message, "error"); }
     finally { setPlacingOrder(false); }
-  };
+};
 
   const total = cart.reduce((s, item) => {
     const price = item.price || item.product?.price || 0;
@@ -1913,7 +2006,7 @@ function CartPage({ onCartChange }) {
   }, 0);
 
   return (
-    <div className="page-pad" style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px" }}>
+    <div className="page-wrap" style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px" }}>
       <h1 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 32, marginBottom: 28 }}>🛒 Your Cart</h1>
 
       {loading ? <Spinner /> : cart.length === 0 ? (
@@ -1924,8 +2017,7 @@ function CartPage({ onCartChange }) {
           <Btn onClick={() => navigate("products")}>Browse Products</Btn>
         </Card>
       ) : (
-        <div className="cart-grid">
-          {/* Items */}
+        <div className="cart-layout" style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 24, alignItems: "start" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {cart.map((item, i) => {
               const name = item.productName || item.product?.name || item.name || "Product";
@@ -1933,35 +2025,32 @@ function CartPage({ onCartChange }) {
               const qty = item.quantity || 1;
               const id = item.id || item.cartItemId;
               return (
-                <Card key={id || i} style={{ display: "flex", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
-                  <div className="cart-item-image" style={{
+                <Card key={id || i} style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                  <div style={{
                     width: 70, height: 70, background: G.surfaceAlt, borderRadius: G.radiusSm,
-                    display: "grid", placeItems: "center", fontSize: 28, flexShrink: 0, overflow: "hidden",
-                  }}>
-                    {item.product?.imageUrl || item.imageUrl
-                      ? <img src={item.product?.imageUrl || item.imageUrl} style={{ width: "100%", height: "100%", objectFit: "contain", padding: "4px" }} alt="" />
-                      : "📦"}
+                    display: "grid", placeItems: "center", fontSize: 28, flexShrink: 0,
+                    overflow: "hidden",
+                    }}>
+                    {item.product?.imageUrl || item.imageUrl ? <img src={item.product?.imageUrl || item.imageUrl} style={{ width: "100%", height: "100%", objectFit: "contain", padding: "4px" }} alt="" /> : "📦" }
                   </div>
-
-                  <div style={{ flex: 1, minWidth: 120 }}>
-                    <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>{name}</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <button onClick={() => updateQty(id, qty - 1)} style={{
-                        width: 28, height: 28, borderRadius: "50%", border: `1px solid ${G.border}`,
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>{name}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+                      <button onClick={() => updateQty(id, qty - 1)} style={{ 
+                        width: 26, height: 26, borderRadius: "50%", border: `1px solid ${G.border}`,
                         background: G.surfaceAlt, color: G.text, cursor: "pointer", fontSize: 16,
                         display: "grid", placeItems: "center"
                       }}>−</button>
                       <span style={{ color: G.text, fontWeight: 700, minWidth: 20, textAlign: "center" }}>{qty}</span>
                       <button onClick={() => updateQty(id, qty + 1)} style={{
-                        width: 28, height: 28, borderRadius: "50%", border: `1px solid ${G.border}`,
-                        background: G.surfaceAlt, color: G.text, cursor: "pointer", fontSize: 16,
-                        display: "grid", placeItems: "center"
+                      width: 26, height: 26, borderRadius: "50%", border: `1px solid ${G.border}`,
+                      background: G.surfaceAlt, color: G.text, cursor: "pointer", fontSize: 16,
+                      display: "grid", placeItems: "center"
                       }}>+</button>
-                    </div>
                   </div>
-
-                  <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 17, color: G.accent }}>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 18, color: G.accent }}>
                       ₹{(price * qty).toLocaleString()}
                     </div>
                     <Btn variant="danger" size="sm" style={{ marginTop: 6 }} onClick={() => remove(id)}>Remove</Btn>
@@ -1971,8 +2060,7 @@ function CartPage({ onCartChange }) {
             })}
           </div>
 
-          {/* Summary */}
-          <Card className="cart-summary-sticky" style={{ position: "sticky", top: 80 }}>
+          <Card className="cart-summary" style={{ position: "sticky", top: 80 }}>
             <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 18, marginBottom: 20 }}>Order Summary</h3>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, color: G.muted, fontSize: 14 }}>
               <span>Items ({cart.length})</span><span>₹{total.toLocaleString()}</span>
@@ -2020,7 +2108,7 @@ function OrdersPage() {
   };
 
   return (
-    <div className="page-pad" style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px" }}>
+    <div className="page-wrap" style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px" }}>
       <h1 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 32, marginBottom: 28 }}>📋 My Orders</h1>
 
       {loading ? <Spinner /> : orders.length === 0 ? (
@@ -2033,14 +2121,16 @@ function OrdersPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {orders.map((order, i) => {
             const items = order.items || order.orderItems || [];
-            const total = order.totalPrice || order.totalAmount || order.total || 0;
+            const total = order.totalPrice || order.totalAmount || order.total || 0;  
             const status = order.status || order.orderStatus || "Pending";
             const date = order.createdAt || order.orderDate;
             return (
               <Card key={order.id || i} style={{ animation: `slideUp ${0.1 + i * 0.07}s ease both` }}>
-                <div className="order-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                   <div>
-                    <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17 }}>Order #{order.id || i + 1}</div>
+                    <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17 }}>
+                      Order #{order.id || i + 1}
+                    </div>
                     {date && <div style={{ color: G.muted, fontSize: 13, marginTop: 3 }}>{new Date(date).toLocaleDateString()}</div>}
                   </div>
                   <Badge color={statusColor(status)}>{status}</Badge>
@@ -2049,7 +2139,7 @@ function OrdersPage() {
                 {items.length > 0 && (
                   <div style={{ background: G.surfaceAlt, borderRadius: G.radiusSm, padding: "10px 14px", marginBottom: 14 }}>
                     {items.map((item, j) => (
-                      <div key={j} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, padding: "4px 0", color: G.muted, flexWrap: "wrap", gap: 4 }}>
+                      <div key={j} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, padding: "4px 0", color: G.muted }}>
                         <span>{item.productName || item.product?.name || "Item"} × {item.quantity || 1}</span>
                         <span>₹{((item.price || item.product?.price || 0) * (item.quantity || 1)).toLocaleString()}</span>
                       </div>
@@ -2078,7 +2168,7 @@ function AdminPage() {
   const toast = useToast();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ name: "", description: "", price: "", stock: "", imageUrl: "" });
+  const [form, setForm] = useState({ name: "", description: "", price: "",  stock: "", imageUrl: "" });
   const [editId, setEditId] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -2106,7 +2196,7 @@ function AdminPage() {
         await api.post("/api/products", payload);
         toast("Product added!", "success");
       }
-      setForm({ name: "", description: "", price: "", stock: "", imageUrl: "" });
+      setForm({ name: "", description: "", price: "", imageUrl: "" });
       setEditId(null);
       load();
     } catch (err) { toast(err.message, "error"); }
@@ -2115,18 +2205,21 @@ function AdminPage() {
 
   const del = async (id) => {
     if (!confirm("Delete this product?")) return;
-    try { await api.del(`/api/products/${id}`); toast("Product deleted", "success"); load(); }
-    catch (err) { toast(err.message, "error"); }
+    try {
+      await api.del(`/api/products/${id}`);
+      toast("Product deleted", "success");
+      load();
+    } catch (err) { toast(err.message, "error"); }
   };
 
   const startEdit = (p) => {
     setEditId(p.id);
-    setForm({ name: p.name || p.productName || "", description: p.description || "", price: String(p.price || ""), stock: String(p.stock || ""), imageUrl: p.imageUrl || "" });
+    setForm({ name: p.name || p.productName || "", description: p.description || "", price: String(p.price || ""), imageUrl: p.imageUrl || "" });
     window.scrollTo(0, 0);
   };
 
   return (
-    <div className="admin-page-pad" style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 24px" }}>
+    <div className="page-wrap" style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 24px" }}>
       <h1 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 32, marginBottom: 8 }}>⚙️ Admin Panel</h1>
       <p style={{ color: G.muted, marginBottom: 30 }}>Manage your product catalog</p>
 
@@ -2135,16 +2228,16 @@ function AdminPage() {
         <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 18, marginBottom: 20 }}>
           {editId ? "✏️ Edit Product" : "➕ Add New Product"}
         </h3>
-        <div className="admin-form-grid">
+        <div className="admin-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <div><label>Product Name</label><input placeholder="e.g. Nike Air Max" value={form.name} onChange={set("name")} /></div>
           <div><label>Price (₹)</label><input type="number" placeholder="e.g. 4999" value={form.price} onChange={set("price")} /></div>
           <div><label>Stock Quantity</label><input type="number" placeholder="e.g. 50" value={form.stock} onChange={set("stock")} /></div>
-          <div className="full-col" style={{ gridColumn: "1/-1" }}><label>Description</label><input placeholder="Short product description" value={form.description} onChange={set("description")} /></div>
-          <div className="full-col" style={{ gridColumn: "1/-1" }}><label>Image URL (optional)</label><input placeholder="https://…" value={form.imageUrl} onChange={set("imageUrl")} /></div>
+          <div className="span-2" style={{ gridColumn: "1/-1" }}><label>Description</label><input placeholder="Short product description" value={form.description} onChange={set("description")} /></div>
+          <div className="span-2" style={{ gridColumn: "1/-1" }}><label>Image URL (optional)</label><input placeholder="https://…" value={form.imageUrl} onChange={set("imageUrl")} /></div>
         </div>
-        <div style={{ display: "flex", gap: 12, marginTop: 18, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
           <Btn onClick={save} disabled={saving}>{saving ? "Saving…" : editId ? "Update Product" : "Add Product"}</Btn>
-          {editId && <Btn variant="ghost" onClick={() => { setEditId(null); setForm({ name: "", description: "", price: "", stock: "", imageUrl: "" }); }}>Cancel</Btn>}
+          {editId && <Btn variant="ghost" onClick={() => { setEditId(null); setForm({ name: "", description: "", price: "", imageUrl: "" }); }}>Cancel</Btn>}
         </div>
       </Card>
 
@@ -2159,23 +2252,23 @@ function AdminPage() {
               <thead>
                 <tr style={{ background: G.surfaceAlt }}>
                   {["ID", "Name", "Description", "Price", "Actions"].map(h => (
-                    <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 12, color: G.muted, fontWeight: 700, letterSpacing: 0.5, whiteSpace: "nowrap" }}>{h}</th>
+                    <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: 12, color: G.muted, fontWeight: 700, letterSpacing: 0.5 }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {products.map((p, i) => (
                   <tr key={p.id || i} style={{ borderTop: `1px solid ${G.border}` }}>
-                    <td style={{ padding: "12px 16px", color: G.muted, fontSize: 13 }}>#{p.id}</td>
-                    <td style={{ padding: "12px 16px", fontWeight: 600, whiteSpace: "nowrap" }}>{p.name || p.productName}</td>
-                    <td style={{ padding: "12px 16px", color: G.muted, fontSize: 13, maxWidth: 160 }}>
+                    <td style={{ padding: "14px 20px", color: G.muted, fontSize: 13 }}>#{p.id}</td>
+                    <td style={{ padding: "14px 20px", fontWeight: 600 }}>{p.name || p.productName}</td>
+                    <td style={{ padding: "14px 20px", color: G.muted, fontSize: 13, maxWidth: 200 }}>
                       <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.description || "—"}</span>
                     </td>
-                    <td style={{ padding: "12px 16px", fontFamily: "'Syne',sans-serif", fontWeight: 700, color: G.accent, whiteSpace: "nowrap" }}>₹{(p.price || 0).toLocaleString()}</td>
-                    <td style={{ padding: "12px 16px" }}>
+                    <td style={{ padding: "14px 20px", fontFamily: "'Syne',sans-serif", fontWeight: 700, color: G.accent }}>₹{(p.price || 0).toLocaleString()}</td>
+                    <td style={{ padding: "14px 20px" }}>
                       <div style={{ display: "flex", gap: 8 }}>
                         <Btn size="sm" variant="ghost" onClick={() => startEdit(p)}>Edit</Btn>
-                        <Btn size="sm" variant="danger" onClick={() => del(p.id)}>Del</Btn>
+                        <Btn size="sm" variant="danger" onClick={() => del(p.id)}>Delete</Btn>
                       </div>
                     </td>
                   </tr>
@@ -2193,7 +2286,8 @@ function AdminPage() {
   );
 }
 
-// ─── ADMIN ORDERS ──────────────────────────────────────────────────────────
+// ─── ORDER MANAGEMENT PAGE ─────────────────────────────────────────────────────────────
+
 function AdminOrdersSection() {
   const api = useApi();
   const toast = useToast();
@@ -2230,7 +2324,9 @@ function AdminOrdersSection() {
   return (
     <Card style={{ padding: 0, overflow: "hidden", marginTop: 32 }}>
       <div style={{ padding: "18px 22px", borderBottom: `1px solid ${G.border}` }}>
-        <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 18 }}>All Orders ({orders.length})</h3>
+        <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 18 }}>
+          All Orders ({orders.length})
+        </h3>
       </div>
       {loading ? <Spinner /> : (
         <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
@@ -2238,26 +2334,28 @@ function AdminOrdersSection() {
             <thead>
               <tr style={{ background: G.surfaceAlt }}>
                 {["Order ID", "Username", "Total", "Date", "Status", "Update"].map(h => (
-                  <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 12, color: G.muted, fontWeight: 700, whiteSpace: "nowrap" }}>{h}</th>
+                  <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: 12, color: G.muted, fontWeight: 700 }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {orders.map((order, i) => (
                 <tr key={order.id || i} style={{ borderTop: `1px solid ${G.border}` }}>
-                  <td style={{ padding: "12px 16px", color: G.muted }}>#{order.id}</td>
-                  <td style={{ padding: "12px 16px", fontWeight: 600, whiteSpace: "nowrap" }}>{order.username}</td>
-                  <td style={{ padding: "12px 16px", color: G.accent, fontFamily: "'Syne',sans-serif", fontWeight: 700, whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "14px 20px", color: G.muted }}>#{order.id}</td>
+                  <td style={{ padding: "14px 20px", fontWeight: 600 }}>{order.username}</td>
+                  <td style={{ padding: "14px 20px", color: G.accent, fontFamily: "'Syne',sans-serif", fontWeight: 700 }}>
                     ₹{(order.totalPrice || 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "12px 16px", color: G.muted, fontSize: 13, whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "14px 20px", color: G.muted, fontSize: 13 }}>
                     {order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "—"}
                   </td>
-                  <td style={{ padding: "12px 16px" }}>
+                  <td style={{ padding: "14px 20px" }}>
                     <Badge color={statusColor(order.status)}>{order.status}</Badge>
                   </td>
-                  <td style={{ padding: "12px 16px" }}>
-                    <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)}
+                  <td style={{ padding: "14px 20px" }}>
+                    <select
+                      value={order.status}
+                      onChange={e => updateStatus(order.id, e.target.value)}
                       style={{ width: "auto", padding: "6px 10px", fontSize: 13 }}>
                       <option value="PENDING">PENDING</option>
                       <option value="SHIPPED">SHIPPED</option>
@@ -2331,9 +2429,10 @@ function AppInner({ cartCount, setCartCount }) {
       <main style={{ minHeight: "calc(100vh - 64px)" }}>
         {pages[page] || <HomePage />}
       </main>
-      <footer style={{ borderTop: `1px solid ${G.border}`, padding: "24px 20px", textAlign: "center", color: G.muted, fontSize: 13 }}>
+      <footer style={{ borderTop: `1px solid ${G.border}`, padding: "24px 32px", textAlign: "center", color: G.muted, fontSize: 13 }}>
         <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, color: G.text }}>Cartify</span> — Built with ❤️ using Spring Boot + React
       </footer>
     </div>
   );
 }
+
