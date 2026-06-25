@@ -1159,7 +1159,6 @@
 
 
 
-
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
@@ -1397,8 +1396,13 @@ const css = `
   }
 
   @media (max-width: 480px) {
-    /* Even smaller screens: 2-col product grid */
     .products-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .product-img-box { min-height: 120px !important; max-height: 140px !important; }
+    .product-price-row { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+    .product-price-row button { width: 100% !important; justify-content: center !important; }
+    .product-name { font-size: 13px !important; height: auto !important; min-height: 36px !important; }
+    .product-desc { font-size: 12px !important; height: auto !important; min-height: 32px !important; }
+    .products-grid .product-card > div { padding: 12px !important; }
   }
 `;
 
@@ -1869,7 +1873,7 @@ function ProductsPage() {
       </div>
 
       {loading ? <Spinner /> : (
-        <div className="products-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(250px,1fr))", gap: 20, alignItems: "stretch" }}>
+        <div className="products-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 16, alignItems: "stretch" }}>
           {filtered.length === 0 && (
             <p style={{ color: G.muted, gridColumn: "1/-1", textAlign: "center", padding: 40 }}>No products found.</p>
           )}
@@ -1886,10 +1890,10 @@ function ProductsPage() {
                 height: "100%"
               }}>
                 {/* Image container - fixed height always */}
-                <div style={{
-                  minHeight: 200, maxHeight: 220, background: G.surfaceAlt, 
+                <div className="product-img-box" style={{
+                  minHeight: 160, maxHeight: 180, background: G.surfaceAlt, 
                   borderRadius: G.radiusSm, display: "flex", alignItems: "center",
-                  justifyContent: "center", fontSize: 52, marginBottom: 16, flexShrink: 0,
+                  justifyContent: "center", fontSize: 52, marginBottom: 12, flexShrink: 0,
                   padding: "8px",
                 }}>
                   {p.imageUrl
@@ -1905,7 +1909,7 @@ function ProductsPage() {
                 </div>
 
                 {/* Name - fixed height */}
-                <h3 style={{
+                <h3 className="product-name" style={{
                   fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17,
                   marginBottom: 6, height: 48, overflow: "hidden",
                   display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical"
@@ -1914,7 +1918,7 @@ function ProductsPage() {
                 </h3>
 
                 {/* Description - fixed height */}
-                <p style={{
+                <p className="product-desc" style={{
                   color: G.muted, fontSize: 13, lineHeight: 1.5, marginBottom: 14,
                   height: 40, overflow: "hidden",
                   display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
@@ -1924,7 +1928,7 @@ function ProductsPage() {
                 </p>
 
                 {/* Price + Button - always at bottom */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto" }}>
+                <div className="product-price-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", gap: 6 }}>
                   <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20, color: G.accent }}>
                     ₹{(p.price || 0).toLocaleString()}
                   </span>
@@ -2435,4 +2439,3 @@ function AppInner({ cartCount, setCartCount }) {
     </div>
   );
 }
-
